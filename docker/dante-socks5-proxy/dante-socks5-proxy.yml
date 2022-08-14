@@ -1,0 +1,17 @@
+version: "3.9"
+
+services:
+  dante-socks5-proxy:
+    build:
+      context: ./build
+    image: dante-socks5-proxy:latest
+    hostname: dante-socks5-proxy
+    restart: unless-stopped
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./build/sockd.conf:/etc/dante/sockd.conf
+    tmpfs:
+      - /run
+    ports:
+      - "1080:1080"
+    container_name: dante-socks5-proxy
