@@ -1,0 +1,4 @@
+volume/data/**
+!volume/data/.gitkeep
+volume/log/**
+!volume/log/.gitkeep

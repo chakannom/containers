@@ -13,5 +13,5 @@ services:
     tmpfs:
       - /run
     ports:
-      - "1080:1080"
+      - 1080:1080
     container_name: dante-socks5-proxy
