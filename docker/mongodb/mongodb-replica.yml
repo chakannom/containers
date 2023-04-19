@@ -1,0 +1,42 @@
+services:
+  mongodb-replica01:
+    image: mongo:6.0.5
+    hostname: mongodb-replica01
+    restart: unless-stopped
+    ports:
+      - 30001:30001
+    container_name: mongodb-replica01
+    command: mongod --replSet mongo-replset --bind_ip 0.0.0.0 --port 30001
+    healthcheck:
+      test: ["CMD", "mongo", "--port", "30001", "--eval", "db.adminCommand('ping')"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+
+  mongodb-replica02:
+    image: mongo:6.0.5
+    hostname: mongodb-replica02
+    restart: unless-stopped
+    ports:
+      - 30002:30002
+    container_name: mongodb-replica02
+    command: mongod --replSet mongo-replset --bind_ip 0.0.0.0 --port 30002
+    healthcheck:
+      test: ["CMD", "mongo", "--port", "30002", "--eval", "db.adminCommand('ping')"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+
+  mongodb-replica03:
+    image: mongo:6.0.5
+    hostname: mongodb-replica03
+    restart: unless-stopped
+    ports:
+      - 30003:30003
+    container_name: mongodb-replica03
+    command: mongod --replSet mongo-replset --bind_ip 0.0.0.0 --port 30003
+    healthcheck:
+      test: ["CMD", "mongo", "--port", "30003", "--eval", "db.adminCommand('ping')"]
+      interval: 30s
+      timeout: 30s
+      retries: 3

@@ -1,0 +1,19 @@
+services:
+  portainer:
+    image: portainer/portainer-ce:2.17.1
+    hostname: portainer
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+    restart: unless-stopped
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./volume/data:/data
+    ports:
+      - 9000:9000
+    container_name: portainer
+    command: ['-H', 'unix:///var/run/docker.sock']

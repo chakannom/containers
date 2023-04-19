@@ -1,9 +1,7 @@
-version: "3.9"
-
 services:
-  mongodb:
-    image: mongo:5.0.10
-    hostname: mongodb
+  mongodb-single:
+    image: mongo:6.0.5
+    hostname: mongodb-single
     restart: unless-stopped
     volumes:
       - /etc/localtime:/etc/localtime:ro
@@ -15,7 +13,7 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=mongodb
     ports:
       - 27017:27017
-    container_name: mongodb
+    container_name: mongodb-single
     command: --config /data/conf/mongod.conf
     healthcheck:
        test: ["CMD","mongo", "--eval", "db.adminCommand('ping')"]
