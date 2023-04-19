@@ -1,0 +1,114 @@
+services:
+  kafka-multiple01:
+    image: confluentinc/cp-kafka:7.3.3
+    hostname: kafka-multiple01
+    restart: unless-stopped
+    depends_on:
+      zookeeper-multiple01:
+        condition: service_started
+      zookeeper-multiple02:
+        condition: service_started
+      zookeeper-multiple03:
+        condition: service_started
+    ports:
+      - 29092:29092
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper-multiple01:2181,zookeeper-multiple02:2181,zookeeper-multiple03:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-multiple01:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1 # 트랜잭션 상태에서 복제 계수를 지정. 단순하게 작업하기 위해서 복제 계수를 1로 설정.
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1 # 트랜잭션 최소 ISR(InSyncReplicas 설정)을 지정. 단순하게 작업하기 위해서 복제 계수를 1로 설정.
+    container_name: kafka-multiple01
+      
+  kafka-multiple02:
+    image: confluentinc/cp-kafka:7.3.3
+    hostname: kafka-multiple02
+    restart: unless-stopped
+    depends_on:
+      zookeeper-multiple01:
+        condition: service_started
+      zookeeper-multiple02:
+        condition: service_started
+      zookeeper-multiple03:
+        condition: service_started
+    ports:
+      - 39092:39092
+    environment:
+      KAFKA_BROKER_ID: 2
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper-multiple01:2181,zookeeper-multiple02:2181,zookeeper-multiple03:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-multiple02:9092,PLAINTEXT_HOST://localhost:39092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+    container_name: kafka-multiple02
+
+  kafka-multiple03:
+    image: confluentinc/cp-kafka:7.3.3
+    hostname: kafka-multiple03
+    restart: unless-stopped
+    depends_on:
+      zookeeper-multiple01:
+        condition: service_started
+      zookeeper-multiple02:
+        condition: service_started
+      zookeeper-multiple03:
+        condition: service_started
+    ports:
+      - 49092:49092
+    environment:
+      KAFKA_BROKER_ID: 3
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper-multiple01:2181,zookeeper-multiple02:2181,zookeeper-multiple03:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-multiple03:9092,PLAINTEXT_HOST://localhost:49092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+    container_name: kafka-multiple03
+
+  zookeeper-multiple01:
+    image: confluentinc/cp-zookeeper:7.3.3
+    hostname: zookeeper-multiple01
+    restart: unless-stopped
+    ports:
+      - 22181:2181
+    environment:
+      ZOOKEEPER_SERVER_ID: 1
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_INIT_LIMIT: 5
+      ZOOKEEPER_SYNC_LIMIT: 2
+      ZOOKEEPER_SERVERS: zookeeper-multiple01:2888:3888;zookeeper-multiple02:2888:3888;zookeeper-multiple03:2888:3888
+    container_name: zookeeper-multiple01
+
+  zookeeper-multiple02:
+    image: confluentinc/cp-zookeeper:7.3.3
+    hostname: zookeeper-multiple02
+    restart: unless-stopped
+    ports:
+      - 32181:2181
+    environment:
+      ZOOKEEPER_SERVER_ID: 2
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_INIT_LIMIT: 5
+      ZOOKEEPER_SYNC_LIMIT: 2
+      ZOOKEEPER_SERVERS: zookeeper-multiple01:2888:3888;zookeeper-multiple02:2888:3888;zookeeper-multiple03:2888:3888
+    container_name: zookeeper-multiple02
+
+  zookeeper-multiple03:
+    image: confluentinc/cp-zookeeper:7.3.3
+    hostname: zookeeper-multiple03
+    restart: unless-stopped
+    ports:
+      - 42181:2181
+    environment:
+      ZOOKEEPER_SERVER_ID: 3
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_INIT_LIMIT: 5
+      ZOOKEEPER_SYNC_LIMIT: 2
+      ZOOKEEPER_SERVERS: zookeeper-multiple01:2888:3888;zookeeper-multiple02:2888:3888;zookeeper-multiple03:2888:3888
+    container_name: zookeeper-multiple03
