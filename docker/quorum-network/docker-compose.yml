@@ -1,0 +1,181 @@
+x-quorum-def:
+  &quorum-def
+  restart: "on-failure"
+  build:
+    context: config/goquorum
+    args:
+      QUORUM_VERSION: ${QUORUM_VERSION:-latest}
+  expose:
+    - 30303
+    - 8545
+    - 9545
+  healthcheck:
+    test: ["CMD", "wget", "--spider", "--proxy", "off", "http://localhost:8545"]
+    interval: 3s
+    timeout: 3s
+    retries: 10
+    start_period: 5s
+
+services:
+  validator1:
+    << : *quorum-def
+    hostname: validator1
+    networks:
+      quorum-bridge:
+        ipv4_address: 172.16.239.11
+    ports:
+      - 21001:8545/tcp
+      - 30303
+      - 9545
+    volumes:
+      - ./config/nodes/validator1:/config/keys
+      - ./logs/quorum:/var/log/quorum/
+    container_name: validator1
+
+  validator2:
+    << : *quorum-def
+    hostname: validator2
+    networks:
+      quorum-bridge:
+        ipv4_address: 172.16.239.12
+    ports:
+      - 21002:8545/tcp
+      - 30303
+      - 9545
+    volumes:
+      - ./config/nodes/validator2:/config/keys
+      - ./logs/quorum:/var/log/quorum/
+    container_name: validator2
+
+  validator3:
+    << : *quorum-def
+    hostname: validator3
+    networks:
+      quorum-bridge:
+        ipv4_address: 172.16.239.13
+    ports:
+      - 21003:8545/tcp
+      - 30303
+      - 9545
+    volumes:
+      - ./config/nodes/validator3:/config/keys
+      - ./logs/quorum:/var/log/quorum/
+    container_name: validator3
+
+  validator4:
+    << : *quorum-def
+    hostname: validator4
+    networks:
+      quorum-bridge:
+        ipv4_address: 172.16.239.14
+    ports:
+      - 21004:8545/tcp
+      - 30303
+      - 9545
+    volumes:
+      - ./config/nodes/validator4:/config/keys
+      - ./logs/quorum:/var/log/quorum/
+    container_name: validator4
+
+  rpcnode:
+    << : *quorum-def
+    hostname: rpcnode
+    networks:
+      quorum-bridge:
+        ipv4_address: 172.16.239.15
+    ports:
+      - 8545:8545/tcp
+      - 8546:8546/tcp
+      - 30303
+      - 9545
+    volumes:
+      - ./config/nodes/rpcnode:/config/keys
+      - ./logs/quorum:/var/log/quorum/
+    container_name: rpcnode
+
+  explorer:
+    image: consensys/quorum-explorer:${QUORUM_EXPLORER_VERSION:-latest}
+    hostname: explorer
+    networks:
+      quorum-bridge:
+        ipv4_address: 172.16.239.31
+    ports:
+      - 25000:25000/tcp
+    depends_on:
+      - rpcnode
+    volumes:
+      - ./quorum-explorer/config.json:/app/config.json
+      - ./quorum-explorer/env:/app/.env.production
+    container_name: explorer    
+
+  prometheus:
+    image: "prom/prometheus:v2.46.0"
+    hostname: prometheus
+    networks:
+      quorum-bridge:
+        ipv4_address: 172.16.239.32
+    ports:
+      - 9090:9090/tcp
+    volumes:
+      - ./config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus:/prometheus
+    container_name: prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+
+  grafana:
+    image: "grafana/grafana:10.1.0"
+    hostname: grafana
+    networks:
+      quorum-bridge:
+        ipv4_address: 172.16.239.33
+    ports:
+      - 3000:3000/tcp
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_USERS_VIEWERS_CAN_EDIT=true
+    volumes:
+      - ./config/grafana/provisioning/:/etc/grafana/provisioning/
+      - grafana:/var/lib/grafana
+    container_name: grafana
+
+  loki:
+    image: "grafana/loki:2.8.4"
+    hostname: loki
+    networks:
+      quorum-bridge:
+        ipv4_address: 172.16.239.34
+    ports:
+      - 3100:3100/tcp
+    volumes:
+      - ./loki/loki.yml:/etc/loki/local-config.yaml:ro
+    container_name: loki
+    command: 
+      - -config.file=/etc/loki/local-config.yaml
+
+  promtail:
+    image: "grafana/promtail:2.8.4"
+    hostname: promtail
+    networks:
+      quorum-bridge:
+        ipv4_address: 172.16.239.35
+    volumes:
+      - ./logs:/var/log
+      - ./promtail/promtail.yml:/etc/promtail/config.yml:ro
+    container_name: promtail
+    command: 
+      - -config.file=/etc/promtail/config.yml
+
+networks:
+  quorum-bridge:
+    name: quorum-bridge
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.16.239.0/24
+
+volumes:
+  ethlogger:
+  prometheus:
+  grafana:

@@ -8,5 +8,6 @@
  - portainer (2023-04-19):
  - redis (2023-04-19):
  - kafka (2023-04-19):
+ - quorum-network (qbft) (2024-07-12):
 
 ## etc
