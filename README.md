@@ -9,5 +9,6 @@
  - redis (2023-04-19):
  - kafka (2023-04-19):
  - quorum-network (qbft) (2024-07-12):
+ - optimism-network (2024-11-07):
 
 ## etc
