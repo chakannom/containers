@@ -1,0 +1,21 @@
+services:
+  redis-stack-server:
+    image: redis/redis-stack-server:7.4.0-v3
+    hostname: redis-stack-server
+    restart: unless-stopped
+    ports:
+      - 6379:6379
+    container_name: redis-stack-server
+    command: redis-stack-server --port 6379
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -p 6379 ping | grep PONG"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+
+  redisinsight:
+    image: redis/redisinsight:2.66.0
+    hostname: redisinsight
+    ports:
+      - 5540:5540
+    container_name: redisinsight
