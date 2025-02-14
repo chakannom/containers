@@ -1,0 +1,20 @@
+services:
+  mysql:
+    image: mysql:9.2.0
+    hostname: mysql
+    restart: unless-stopped
+    volumes:
+      - mysql_data:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=mysql
+    ports:
+      - 3306:3306
+    container_name: mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "--silent"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+
+volumes:
+  mysql_data:

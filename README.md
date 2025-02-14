@@ -10,5 +10,6 @@
  - kafka (2023-04-19):
  - quorum-network (qbft) (2024-07-12):
  - postgresql (2025-02-14):
+ - mysql (2025-02-14):
 
 ## etc
