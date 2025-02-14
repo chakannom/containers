@@ -3,6 +3,8 @@ services:
     image: redis:7.0.9
     hostname: redis
     restart: unless-stopped
+    volumes:
+      - redis_data:/data
     ports:
       - 6379:6379
     container_name: redis
@@ -12,3 +14,6 @@ services:
       interval: 30s
       timeout: 30s
       retries: 3
+
+volumes:
+  redis_data:

@@ -3,6 +3,8 @@ services:
     image: redis/redis-stack-server:7.4.0-v3
     hostname: redis-stack-server
     restart: unless-stopped
+    volumes:
+      - redis_stack_data:/data
     ports:
       - 6379:6379
     container_name: redis-stack-server
@@ -19,3 +21,6 @@ services:
     ports:
       - 5540:5540
     container_name: redisinsight
+
+volumes:
+  redis_stack_data:
