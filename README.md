@@ -11,5 +11,6 @@
  - quorum-network (qbft) (2024-07-12):
  - postgresql (2025-02-14):
  - mysql (2025-02-14):
+ - besu-single-node (2025-05-29):
 
 ## etc

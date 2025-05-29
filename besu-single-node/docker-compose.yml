@@ -1,0 +1,56 @@
+services:
+  besu-single-node:
+    image: hyperledger/besu:25.4.1
+    hostname: besu-single-node
+    restart: unless-stopped
+    networks:
+      besu-single-node-network:
+        ipv4_address: 171.171.171.11
+    ports:
+      - 8545:8545/tcp
+      - 8546:8546/tcp
+      - 30303
+      - 9545
+    environment:
+      - OTEL_RESOURCE_ATTRIBUTES=service.name=validator1,service.version=25.4.1
+    labels:
+      - consensus=besu
+    volumes:
+      - node_data:/var/lib/besu
+      - ./node/config/:/config
+      - ./node/keys:/opt/besu/keys
+    container_name: besu-single-node
+    command: [
+      "--config-file=/config/config.toml",
+      "--p2p-host=$$(hostname -i)",
+      "--rpc-http-api=EEA,WEB3,ETH,NET,TRACE,DEBUG,ADMIN,TXPOOL,PERM,QBFT",
+      "--rpc-ws-api=EEA,WEB3,ETH,NET,TRACE,DEBUG,ADMIN,TXPOOL,PERM,QBFT",
+      "--logging WARN"
+    ]
+
+  besu-single-node-explorer:
+    image: consensys/quorum-explorer:latest
+    hostname: besu-single-node-explorer
+    restart: unless-stopped
+    networks:
+      besu-single-node-network:
+        ipv4_address: 171.171.171.31
+    ports:
+      - 25000:25000/tcp
+    depends_on:
+      - besu-single-node
+    volumes:
+      - ./node-explorer/config.json:/app/config.json
+      - ./node-explorer/env:/app/.env.production
+    container_name: besu-single-node-explorer
+
+volumes:
+  node_data:
+
+networks:
+  besu-single-node-network:
+    name: besu-single-node-network
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 171.171.171.0/24

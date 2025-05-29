@@ -1,0 +1,12 @@
+{
+  "algorithm": "qbft",
+  "nodes": [
+    {
+      "name": "besu-single-node",
+      "client": "besu",
+      "rpcUrl": "http://besu-single-node:8545",
+      "privateTxUrl": ""
+    }
+  ]
+}
+ 
