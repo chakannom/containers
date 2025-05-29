@@ -3,8 +3,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      args:
-        DISABLE_MAX_CODE_SIZE: "true"
     image: besu-single-node-builder:25.4.1
     hostname:  besu-single-node-builder
     volumes:
