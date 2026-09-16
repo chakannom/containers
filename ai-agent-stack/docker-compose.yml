@@ -1,0 +1,95 @@
+services:
+
+  ### Multica Init ###
+  mulica-init:
+    build:
+      context: ./multica-init
+    restart: no
+    networks:
+      - ai-agent-stack
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./multica-init/source:/multica
+    container_name: multica-init
+
+  ### Multica Daemon ###
+  multica-daemon:
+    build:
+      context: ./multica-daemon
+    restart: unless-stopped
+    networks:
+      - ai-agent-stack
+      - multica_default
+    depends_on:
+      opencode:
+        condition: service_started
+      hermes:
+        condition: service_started
+      ollama:
+        condition: service_started
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./workspace:/workspace
+    environment:
+      OPENCODE_CONTAINER: opencode
+      HERMES_CONTAINER: hermes
+      OLLAMA_HOST: http://ollama:11434
+    container_name: multica-daemon
+
+  ### OpenCode ###
+  opencode:
+    image: ghcr.io/anomalyco/opencode:latest
+    restart: unless-stopped
+    networks:
+      - ai-agent-stack
+    depends_on:
+      ollama:
+        condition: service_started
+    environment:
+      OLLAMA_HOST: http://ollama:11434
+    volumes:
+      - opencode_data:/root/.local/share/opencode
+      - ./workspace:/workspace
+    container_name: opencode
+    entrypoint: ["sleep", "infinity"]
+
+  ### Hermes ###
+  hermes:
+    image: nousresearch/hermes-agent:latest
+    restart: unless-stopped
+    networks:
+      - ai-agent-stack
+    depends_on:
+      ollama:
+        condition: service_started
+    environment:
+      OLLAMA_HOST: http://ollama:11434
+    volumes:
+      - hermes_data:/opt/data
+      - ./workspace:/workspace
+    container_name: hermes
+    entrypoint: ["sleep", "infinity"]
+    
+  ### Ollama ###
+  ollama:
+    image: ollama/ollama:latest
+    restart: unless-stopped
+    networks:
+      - ai-agent-stack
+    ports:
+      - "11434:11434"
+    environment:
+      OLLAMA_HOST: 0.0.0.0:11434
+    volumes:
+      - ollama_data:/root/.ollama
+    container_name: ollama
+
+volumes:
+  opencode_data:
+  hermes_data:
+  ollama_data:
+
+networks:
+  ai-agent-stack:
+  multica_default:
+    external: true
