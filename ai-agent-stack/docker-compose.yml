@@ -22,7 +22,7 @@ services:
       - multica_default
     depends_on:
       multica-init:
-        condition: service_started
+        condition: service_completed_successfully
       opencode:
         condition: service_started
       hermes:
