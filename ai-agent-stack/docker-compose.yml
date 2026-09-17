@@ -1,7 +1,7 @@
 services:
 
   ### Multica Init ###
-  mulica-init:
+  multica-init:
     build:
       context: ./multica-init
     restart: no
@@ -21,6 +21,8 @@ services:
       - ai-agent-stack
       - multica_default
     depends_on:
+      multica-init:
+        condition: service_started
       opencode:
         condition: service_started
       hermes:
