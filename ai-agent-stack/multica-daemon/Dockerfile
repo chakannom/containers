@@ -9,7 +9,7 @@ RUN apt-get update && \
         docker.io \
     && rm -rf /var/lib/apt/lists/*
 
-COPY certs/*.crt /usr/local/share/ca-certificates/
+COPY certs/*.* /usr/local/share/ca-certificates/
 
 RUN update-ca-certificates
 
