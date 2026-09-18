@@ -2,3 +2,4 @@
 code.sh
 .vscode/extensions
 .vscode/settings
+*.crt

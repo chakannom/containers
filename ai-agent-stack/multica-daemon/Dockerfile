@@ -5,8 +5,13 @@ RUN apt-get update && \
         ca-certificates \
         curl \
         git \
+        jq \
         docker.io \
     && rm -rf /var/lib/apt/lists/*
+
+COPY certs/*.crt /usr/local/share/ca-certificates/
+
+RUN update-ca-certificates
 
 RUN curl -fsSL https://raw.githubusercontent.com/multica-ai/multica/main/scripts/install.sh | bash
 

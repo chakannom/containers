@@ -19,7 +19,6 @@ services:
     restart: unless-stopped
     networks:
       - ai-agent-stack
-      - multica_default
     depends_on:
       multica-init:
         condition: service_completed_successfully
@@ -93,5 +92,3 @@ volumes:
 
 networks:
   ai-agent-stack:
-  multica_default:
-    external: true
