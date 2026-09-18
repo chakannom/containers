@@ -33,12 +33,12 @@ services:
       - ./multica-workspace:/multica-workspace
       - ./workspace:/workspace
     environment:
-      MULTICA_WORKSPACES: /multica-workspace
+      MULTICA_WORKSPACES_ROOT: /multica-workspace
       OLLAMA_HOST: http://ollama:11434
       OPENCODE_CONTAINER: opencode
       HERMES_CONTAINER: hermes
     container_name: multica-daemon
-    entrypoint: ["sleep", "infinity"]
+    # entrypoint: ["sleep", "infinity"]
 
   ### OpenCode ###
   opencode:
