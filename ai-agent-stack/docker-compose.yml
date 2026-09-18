@@ -30,12 +30,15 @@ services:
         condition: service_started
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - ./multica-workspace:/multica-workspace
       - ./workspace:/workspace
     environment:
+      MULTICA_WORKSPACES: /multica-workspace
+      OLLAMA_HOST: http://ollama:11434
       OPENCODE_CONTAINER: opencode
       HERMES_CONTAINER: hermes
-      OLLAMA_HOST: http://ollama:11434
     container_name: multica-daemon
+    entrypoint: ["sleep", "infinity"]
 
   ### OpenCode ###
   opencode:
@@ -53,6 +56,8 @@ services:
       - opencode_data:/root/.local/share/opencode
       # OpenCode config
       - ./opencode/opencode.json:/root/.config/opencode/opencode.json:ro
+      # Multica workspace
+      - ./multica-workspace:/multica-workspace
       # Shared development workspace
       - ./workspace:/workspace
     container_name: opencode
@@ -74,6 +79,8 @@ services:
       - hermes_data:/opt/data
       # Hermesconfig
       - ./hermes/config.yaml:/opt/data/config.yaml:ro
+      # Multica workspace
+      - ./multica-workspace:/multica-workspace
       # Shared development workspace
       - ./workspace:/workspace
     container_name: hermes
