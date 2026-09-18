@@ -49,7 +49,11 @@ services:
     environment:
       OLLAMA_HOST: http://ollama:11434
     volumes:
+      # OpenCode persistent data
       - opencode_data:/root/.local/share/opencode
+      # OpenCode config
+      - ./opencode/opencode.json:/root/.config/opencode/opencode.json:ro
+      # Shared development workspace
       - ./workspace:/workspace
     container_name: opencode
     entrypoint: ["sleep", "infinity"]
@@ -66,7 +70,11 @@ services:
     environment:
       OLLAMA_HOST: http://ollama:11434
     volumes:
+      # Hermes persistent data
       - hermes_data:/opt/data
+      # Hermesconfig
+      - ./hermes/config.yaml:/opt/data/config.yaml:ro
+      # Shared development workspace
       - ./workspace:/workspace
     container_name: hermes
     entrypoint: ["sleep", "infinity"]
@@ -81,9 +89,41 @@ services:
       - "11434:11434"
     environment:
       OLLAMA_HOST: 0.0.0.0:11434
+      # Hermes는 agent/tool 사용에 충분한 context가 필요하다.
+      # Qwen3.5 자체는 256K context 모델이지만
+      # Ollama가 실제로 사용할 context는 서버 설정에 영향을 받는다.
+      OLLAMA_CONTEXT_LENGTH: 65536
+      # 여러 Agent가 동시에 접근할 수 있도록 설정
+      OLLAMA_KEEP_ALIVE: 30m
     volumes:
       - ollama_data:/root/.ollama
     container_name: ollama
+
+  ### Ollama Init ###
+  ollama-init:
+    image: ollama/ollama:latest
+    restart: no
+    networks:
+      - ai-agent-stack
+    depends_on:
+      ollama:
+        condition: service_started
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+    container_name: ollama-init
+    entrypoint:
+      - /bin/sh
+      - -c
+    command:
+      - |
+        echo "Waiting for Ollama..."
+        until ollama list >/dev/null 2>&1; do
+          sleep 2
+        done
+        echo "Pulling qwen3.5:2b..."
+        ollama pull qwen3.5:2b
+        echo "Model ready."
+        ollama list
 
 volumes:
   opencode_data:

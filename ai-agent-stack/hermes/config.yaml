@@ -1,0 +1,6 @@
+model:
+  default: qwen3.5:2b
+  provider: custom
+  base_url: http://ollama:11434/v1
+  api_key: ""
+  context_length: 65536
