@@ -1,0 +1,12 @@
+#!/bin/sh
+set -e
+
+if [ -t 0 ]; then
+  exec docker exec \
+    "$HERMES_CONTAINER" \
+    hermes "$@"
+else
+  exec docker exec -i \
+    "$HERMES_CONTAINER" \
+    hermes "$@"
+fi

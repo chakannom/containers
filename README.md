@@ -12,5 +12,6 @@
  - postgresql (2025-02-14):
  - mysql (2025-02-14):
  - besu-single-node (2025-05-29):
+ - ai-agent-stack (2026-09-23):
 
 ## etc

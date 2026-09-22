@@ -1,0 +1,60 @@
+#!/bin/sh
+set -e
+
+if [ "$#" -ne 3 ]; then
+  echo "Usage: $0 <email> <backend_url> <token_name>" >&2
+  exit 1
+fi
+
+EMAIL="$1"
+BACKEND_URL="$2"
+TOKEN_NAME="$3"
+
+# 1. 인증 코드 요청
+curl -s -X POST "$BACKEND_URL/auth/send-code" \
+  -H "Content-Type: application/json" \
+  -d "{\"email\":\"$EMAIL\"}" > /dev/null
+
+echo "Verification code requested." >&2
+
+# 2. Backend 로그에서 code 추출
+CODE=$(docker logs --since 10s multica-backend-1 2>&1 \
+  | grep -oE "Verification code[^0-9]*[0-9]{6}" \
+  | tail -1 \
+  | grep -oE '[0-9]{6}$')
+
+if [ -z "$CODE" ]; then
+  echo "ERROR: verification code not found" >&2
+  exit 1
+fi
+
+echo "Verification code found." >&2
+
+# 3. Code → JWT
+JWT=$(curl -s -X POST "$BACKEND_URL/auth/verify-code" \
+  -H "Content-Type: application/json" \
+  -d "{\"email\":\"$EMAIL\",\"code\":\"$CODE\"}" \
+  | jq -r '.token')
+
+if [ -z "$JWT" ] || [ "$JWT" = "null" ]; then
+  echo "ERROR: JWT authentication failed" >&2
+  exit 1
+fi
+
+echo "JWT obtained." >&2
+
+# 4. JWT → PAT
+PAT=$(curl -s -X POST "$BACKEND_URL/api/tokens" \
+  -H "Authorization: Bearer $JWT" \
+  -H "Content-Type: application/json" \
+  -d "{\"name\":\"$TOKEN_NAME\"}" \
+  | jq -r '.token')
+
+if [ -z "$PAT" ] || [ "$PAT" = "null" ]; then
+  echo "ERROR: PAT generation failed" >&2
+  exit 1
+fi
+
+echo "Multica PAT generated." >&2
+
+echo "$PAT"
